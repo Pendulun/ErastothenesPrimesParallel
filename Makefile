@@ -6,6 +6,7 @@ BUILD=./build/
 SRC=./src/
 INCLUDE=./include/
 ARGCHCKR=arguments/
+PRIMES=primes/
 
 # $(EXEC):	$(BUILD)main.o  $(BUILD)$(COMPR)CompressorLZ78.o $(BUILD)$(COMPR)Compressor.o
 # 	$(CC) $(CFLAGS) -o $(EXEC) $(BUILD)main.o $(BUILD)*/*.o 
@@ -14,14 +15,17 @@ ARGCHCKR=arguments/
 # 	$(CC) $(CFLAGS) -I $(INCLUDE)$(VALID) -I $(INCLUDE)$(COMPR) -c $(SRC)main.cpp -o $(BUILD)main.o
 
 
-$(EXEC):	$(BUILD)main.o $(BUILD)$(ARGCHCKR)ArgumentsChecker.o
-	$(CC) $(CFLAGS) -o $(EXEC) $(BUILD)main.o $(BUILD)*/*.o
+$(EXEC):	$(BUILD)main.o $(BUILD)$(ARGCHCKR)ArgumentsChecker.o $(BUILD)$(PRIMES)ErastothenesSieve.o 
+	$(CC) $(CFLAGS) -fopenmp -o $(EXEC) $(BUILD)main.o $(BUILD)*/*.o
 
 $(BUILD)main.o:	$(SRC)main.cpp $(BUILD)$(ARGCHCKR)ArgumentsChecker.o
-	$(CC) $(CFLAGS) -I $(INCLUDE)$(ARGCHCKR) -c $(SRC)main.cpp -o $(BUILD)main.o
+	$(CC) $(CFLAGS) -I $(INCLUDE)$(ARGCHCKR) -I $(INCLUDE)$(PRIMES) -c $(SRC)main.cpp -fopenmp -o $(BUILD)main.o
 
 $(BUILD)$(ARGCHCKR)ArgumentsChecker.o:	$(SRC)$(ARGCHCKR)ArgumentsChecker.cpp
 	$(CC) $(CFLAGS) -I $(INCLUDE)$(ARGCHCKR) -c $(SRC)$(ARGCHCKR)ArgumentsChecker.cpp -o $(BUILD)$(ARGCHCKR)ArgumentsChecker.o
+
+$(BUILD)$(PRIMES)ErastothenesSieve.o:	$(SRC)$(PRIMES)ErastothenesSieve.cpp
+	$(CC) $(CFLAGS) -I $(INCLUDE)$(PRIMES) -fopenmp -c $(SRC)$(PRIMES)ErastothenesSieve.cpp -o $(BUILD)$(PRIMES)ErastothenesSieve.o
 
 # $(BUILD)$(VALID)Validador.o: $(SRC)$(VALID)Validador.cpp
 # 	$(CC) $(CFLAGS) -I $(INCLUDE)$(VALID) -c $(SRC)$(VALID)Validador.cpp -o $(BUILD)$(VALID)Validador.o

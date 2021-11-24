@@ -1,5 +1,6 @@
 #include <iostream>
 #include "ArgumentsChecker.hpp"
+#include "ErastothenesSieve.hpp"
 
 void usage(){
     std::cout<<"Invalid arguments!\n";
@@ -14,5 +15,10 @@ int main(int argc, const char **argv)
         usage();
     }
 
+    primos::ErastothenesSieve erasSieve;
+
+    erasSieve.getPrimesTill(argumentsChecker.getMaxNumber());
+
+    //Tratar caso maxNumber for <= 2
     return 0;
 }
