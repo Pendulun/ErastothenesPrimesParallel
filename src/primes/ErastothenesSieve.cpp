@@ -12,6 +12,8 @@ namespace primos{
 
         std::list<unsigned int>::iterator iterador;
 
+        auto initTime = std::chrono::high_resolution_clock::now();
+
         while(true){
             //Get the next prime
             if(primeCount == this->numerosPrimos.size()){
@@ -35,14 +37,8 @@ namespace primos{
             primeCount += 1;
         }
 
-        iterador = this->numerosPrimos.begin();
-        for(iterador; iterador != this->numerosPrimos.end(); iterador++){
-            std::cout<<*iterador<<" ";
-        }
-
-        std::cout<<std::endl;
-        
-
+        auto endTime = std::chrono::high_resolution_clock::now();
+        this->timeExec = std::chrono::duration_cast<std::chrono::microseconds>(endTime - initTime);
         //Encontre o primeiro número na lista que seja maior do que p e que não esteja marcado.
         //Caso não exista, pare. Se existir, p vai ser igual a esse novo número.
 
@@ -59,6 +55,19 @@ namespace primos{
         // std::cout<<"Saiu\n";
         // #pragma omp taskwait
         // }   
+    }
+
+    void ErastothenesSieve::printAllPrimes(){
+        std::list<unsigned int>::iterator iterador = this->numerosPrimos.begin();
+        for(iterador; iterador != this->numerosPrimos.end(); iterador++){
+            std::cout<<*iterador<<" ";
+        }
+
+        std::cout<<std::endl;
+    }
+
+    void ErastothenesSieve::printLastExecTime(){
+        std::cout<<this->timeExec.count()<<std::endl;
     }
 
     void ErastothenesSieve::dizOi(){

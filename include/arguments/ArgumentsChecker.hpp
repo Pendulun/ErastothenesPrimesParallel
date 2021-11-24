@@ -19,6 +19,9 @@ namespace dataEntry{
             std::string getOutType();
             unsigned int getNumProcessors();
             unsigned int getMaxNumber();
+            bool isToPrintPrimes();
+            bool isToPrintTime();
+            bool isToPrintAllInfo();
     } ;
 }
 #endif

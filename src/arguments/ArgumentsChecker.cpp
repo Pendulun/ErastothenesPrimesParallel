@@ -67,5 +67,17 @@ namespace dataEntry{
     std::string ArgumentsChecker::getOutType(){
         return this->outType;
     }
+
+    bool ArgumentsChecker::isToPrintPrimes(){
+        return this->outType == "l";
+    }
+
+    bool ArgumentsChecker::isToPrintTime(){
+        return this->outType == "t";
+    }
+
+    bool ArgumentsChecker::isToPrintAllInfo(){
+        return this->outType == "a";
+    }
 }
 

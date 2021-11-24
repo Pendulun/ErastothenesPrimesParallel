@@ -18,7 +18,13 @@ int main(int argc, const char **argv)
     primos::ErastothenesSieve erasSieve;
 
     erasSieve.getPrimesTill(argumentsChecker.getMaxNumber());
+    if(argumentsChecker.isToPrintPrimes() || argumentsChecker.isToPrintAllInfo()){
+        erasSieve.printAllPrimes();
+    }
 
+    if(argumentsChecker.isToPrintTime() || argumentsChecker.isToPrintAllInfo()){
+        erasSieve.printLastExecTime();
+    }
     //Tratar caso maxNumber for <= 2
     return 0;
 }
