@@ -17,7 +17,8 @@ int main(int argc, const char **argv)
 
     primos::ErastothenesSieve erasSieve;
 
-    erasSieve.getPrimesTill(argumentsChecker.getMaxNumber());
+    erasSieve.getPrimesTill(argumentsChecker.getMaxNumber(), argumentsChecker.getNumProcessors());
+
     if(argumentsChecker.isToPrintPrimes() || argumentsChecker.isToPrintAllInfo()){
         erasSieve.printAllPrimes();
     }

@@ -9,12 +9,15 @@
 namespace primos{
     class ErastothenesSieve{
         public:
-            void getPrimesTill(const unsigned int maxNumber);
+            void getPrimesTill(const unsigned int maxNumber, const unsigned int numProcs);
             void printAllPrimes();
             void printLastExecTime();
         private:
             std::list<unsigned int> numerosPrimos;
             std::chrono::duration<double> timeExec;
+            void getPrimesSequential(const unsigned int maxNumber);
+            void getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs);
+            void fillNSizeList(const unsigned int maxNumber);
             void dizOi();
     };
 }

@@ -41,6 +41,8 @@
         "typeinfo": "cpp",
         "list": "cpp",
         "iterator": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "ctime": "cpp",
+        "ratio": "cpp"
     }
 }

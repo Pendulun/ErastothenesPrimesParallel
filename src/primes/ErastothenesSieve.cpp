@@ -1,24 +1,33 @@
 #include "ErastothenesSieve.hpp"
 
 namespace primos{
-    void ErastothenesSieve::getPrimesTill(const unsigned int maxNumber){
-        //Crie uma lista de inteiros consecutivos de 2 até maxNumber
-        for(unsigned int num = 2; num<=maxNumber; num++){
-            this->numerosPrimos.push_back(num);
+    void ErastothenesSieve::getPrimesTill(const unsigned int maxNumber, const unsigned int numProcs){
+
+        this->fillNSizeList(maxNumber);
+
+        auto initTime = std::chrono::high_resolution_clock::now();
+        if(numProcs == 1){
+            this->getPrimesSequential(maxNumber);
+        }else{
+            this->getPrimesParallel(maxNumber, numProcs);
         }
-        //Seja p=2 o primeiro número primo
+        auto endTime = std::chrono::high_resolution_clock::now();
+        this->timeExec = std::chrono::duration_cast<std::chrono::seconds>(endTime - initTime);
+
+    }
+
+    void ErastothenesSieve::getPrimesSequential(const unsigned int maxNumber){
         unsigned int primeAtual = 0;
         unsigned int primeCount = 0;
 
         std::list<unsigned int>::iterator iterador;
-
-        auto initTime = std::chrono::high_resolution_clock::now();
 
         while(true){
             //Get the next prime
             if(primeCount == this->numerosPrimos.size()){
                 break;
             }
+
 
             iterador = std::next(this->numerosPrimos.begin(), primeCount);
             primeAtual = *iterador;
@@ -36,14 +45,9 @@ namespace primos{
 
             primeCount += 1;
         }
+    }
 
-        auto endTime = std::chrono::high_resolution_clock::now();
-        this->timeExec = std::chrono::duration_cast<std::chrono::microseconds>(endTime - initTime);
-        //Encontre o primeiro número na lista que seja maior do que p e que não esteja marcado.
-        //Caso não exista, pare. Se existir, p vai ser igual a esse novo número.
-
-        //Repita a partir do passo 3
-
+    void ErastothenesSieve::getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs){
         //Retorne os números não marcados
         // #pragma omp parallel num_threads(8)
         // #pragma omp single
@@ -57,13 +61,27 @@ namespace primos{
         // }   
     }
 
-    void ErastothenesSieve::printAllPrimes(){
-        std::list<unsigned int>::iterator iterador = this->numerosPrimos.begin();
-        for(iterador; iterador != this->numerosPrimos.end(); iterador++){
-            std::cout<<*iterador<<" ";
+    void ErastothenesSieve::fillNSizeList(const unsigned int maxNumber){
+        this->numerosPrimos.clear();
+        for(unsigned int num = 2; num<=maxNumber; num++){
+            this->numerosPrimos.push_back(num);
         }
+    }
 
-        std::cout<<std::endl;
+    void ErastothenesSieve::printAllPrimes(){
+        if(this->numerosPrimos.size() > 0){
+            unsigned int primesPrinted = 0;
+            std::list<unsigned int>::iterator iterador = this->numerosPrimos.begin();
+            for(iterador; iterador != this->numerosPrimos.end(); iterador++){
+                std::cout<<*iterador;
+                if(primesPrinted == this->numerosPrimos.size()-1){
+                    std::cout<<std::endl;
+                }else{
+                    std::cout<<" ";
+                }
+                primesPrinted++;
+            }
+        }
     }
 
     void ErastothenesSieve::printLastExecTime(){
