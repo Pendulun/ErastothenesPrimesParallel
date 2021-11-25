@@ -22,7 +22,7 @@ namespace primos{
         if(numProcs == 1){
             this->getPrimesSequential2Vector(maxNumber);
         }else{
-            this->getPrimesParallel(maxNumber, numProcs);
+            this->getPrimesParallelVector(maxNumber, numProcs);
         }
         auto endTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::milli> fp_ms = endTime - initTime;
@@ -145,7 +145,7 @@ namespace primos{
 
     bool ErastothenesSieve::isPrimeGivenVectorSequential(const unsigned int number){
         long double squared_number = sqrt(number);
-        //Dá para paralelizar isso
+        //Dá para paralelizar isso ?
         bool result = false;
         for(std::size_t idxPrime = 0; idxPrime < this->numerosPrimosVector.size(); idxPrime++){
             unsigned int element = this->numerosPrimosVector[idxPrime];
@@ -163,43 +163,73 @@ namespace primos{
         return result;
     }
 
-    bool ErastothenesSieve::isPrimeGivenVectorParallel(const unsigned int number){
-        long double squared_number = sqrt(number);
-        //Dá para paralelizar isso
-        bool result = false;
-        bool definiuResult = false;
-        for(std::size_t idxPrime = 0; idxPrime < this->numerosPrimosVector.size(); idxPrime++){
-            unsigned int element = this->numerosPrimosVector[idxPrime];
-            if(!definiuResult){
-                if(element > squared_number){
-                    result = true;
-                    definiuResult = true;
-                    break;
-                }else if((number%element) == 0){
-                    result = false;
-                    definiuResult = true;
-                    break;
-                }
-            }
+    void ErastothenesSieve::getPrimesParallelVector(const unsigned int maxNumber, const unsigned int numProcs){
+        this->numerosPrimosVector.clear();
+
+        if(maxNumber<2){
+            return;
         }
 
-        return result;
+        this->numerosPrimosVector.push_back(2);
+
+        if(maxNumber == 2){
+            return;
+        }
+
+        unsigned int maxLimitForLoop = 0;
+        if(maxNumber%2 == 0){
+            maxLimitForLoop = (maxNumber/2) - 1;
+        }else{
+            maxLimitForLoop = floor(maxNumber/2);
+        }
+
+        unsigned int numAtual = 0;
+        for(unsigned int num = 1; num<=maxLimitForLoop; num++){
+            numAtual = (2*num)+1;
+            bool isPrime = this->isPrimeGivenVectorParallel(numAtual, numProcs);
+
+            //std::cout<<num<<" ISPRIME: "<<isPrime<<std::endl;
+            if(isPrime){
+                this->numerosPrimosVector.push_back(numAtual);
+            }
+        }
+    }
+
+    bool ErastothenesSieve::isPrimeGivenVectorParallel(const unsigned int number, const unsigned int numProcs){
+        long double squared_number = sqrt(number);
+        bool globalNotPrime = false;
+        unsigned int maxIdx = this->numerosPrimosVector.size();
+        #pragma omp parallel num_threads(numProcs) 
+        {
+            bool localNotPrime = false;
+            #pragma omp for nowait schedule(static, 2)
+            for(std::size_t idxPrime = 0; idxPrime < maxIdx; idxPrime++){
+                unsigned int elemento = this->numerosPrimosVector[idxPrime];
+                if(elemento <= squared_number){
+                    localNotPrime = this->isMultipleOf(number, elemento) || localNotPrime;
+                }
+                
+            }
+
+            #pragma omp atomic
+            globalNotPrime = globalNotPrime | localNotPrime;
+
+        }
+        
+        return !globalNotPrime;
 
     }
 
-    void ErastothenesSieve::getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs){
-        //Retorne os números não marcados
-        // #pragma omp parallel num_threads(8)
-        // #pragma omp single
-        // {
-        //     for(unsigned int i = 0; i<maxNumber; i++){
-        //         #pragma omp task
-        //         this->dizOi();
-        //     }
-        // std::cout<<"Saiu\n";
-        // #pragma omp taskwait
-        // }   
+    bool ErastothenesSieve::isMultipleOf(const unsigned int num, const unsigned int prime){
+        //std::cout<<"Thread "<<omp_get_thread_num()<<" se "<<num<<" e multiplo de "<<prime<<std::endl;
+        
+        if((num%prime) == 0){
+            return true;
+        }else{
+            return false;
+        }
     }
+
 
     void ErastothenesSieve::fillNSizeList(const unsigned int maxNumber){
         this->numerosPrimos.clear();
