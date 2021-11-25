@@ -75,13 +75,16 @@ namespace primos{
     }
 
     bool ErastothenesSieve::isPrimeGivenList(const unsigned int number){
+
         for(auto prime : this->numerosPrimos){
+            if(prime > sqrt(number)){
+                return true;
+            }
+
             if(number%prime == 0){
                 return false;
             }
         }
-
-        return true;
     }
 
     void ErastothenesSieve::getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs){
