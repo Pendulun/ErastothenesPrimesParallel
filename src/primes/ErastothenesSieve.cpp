@@ -11,6 +11,11 @@ namespace primos{
         //this->numerosPrimosVector.shrink_to_fit();
     };
 
+    void ErastothenesSieve::clearPrimes(){
+        this->numerosPrimosVector.clear();
+        this->numerosPrimosVector.shrink_to_fit();
+    }
+
     void ErastothenesSieve::getPrimesTill(const unsigned int maxNumber, const unsigned int numProcs){
 
         auto initTime = std::chrono::high_resolution_clock::now();
@@ -131,14 +136,34 @@ namespace primos{
         unsigned int numAtual = 0;
         for(unsigned int num = 1; num<=maxLimitForLoop; num++){
             numAtual = (2*num)+1;
-            if(this->isPrimeGivenVector(numAtual)){
+            if(this->isPrimeGivenVectorSequential(numAtual)){
                 this->numerosPrimosVector.push_back(numAtual);
             }
         }
 
     }
 
-     bool ErastothenesSieve::isPrimeGivenVector(const unsigned int number){
+    bool ErastothenesSieve::isPrimeGivenVectorSequential(const unsigned int number){
+        long double squared_number = sqrt(number);
+        //Dá para paralelizar isso
+        bool result = false;
+        for(std::size_t idxPrime = 0; idxPrime < this->numerosPrimosVector.size(); idxPrime++){
+            unsigned int element = this->numerosPrimosVector[idxPrime];
+            if(element > squared_number){
+                result = true;
+                break;
+            }
+
+            if((number%element) == 0){
+                result = false;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    bool ErastothenesSieve::isPrimeGivenVectorParallel(const unsigned int number){
         long double squared_number = sqrt(number);
         //Dá para paralelizar isso
         bool result = false;
@@ -149,13 +174,13 @@ namespace primos{
                 if(element > squared_number){
                     result = true;
                     definiuResult = true;
-                }
-            
-                if((number%element) == 0){
+                    break;
+                }else if((number%element) == 0){
                     result = false;
                     definiuResult = true;
+                    break;
                 }
-            } 
+            }
         }
 
         return result;

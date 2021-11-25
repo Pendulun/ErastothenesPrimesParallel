@@ -14,10 +14,11 @@ namespace primos{
             void getPrimesTill(const unsigned int maxNumber, const unsigned int numProcs);
             void printAllPrimes();
             void printLastExecTime();
+            void clearPrimes();
             ErastothenesSieve(unsigned int maxNumber);
         private:
             std::list<unsigned int> numerosPrimos;
-            std::vector<unsigned int> numerosPrimosVector;
+            
             std::chrono::duration<double, std::milli> timeExec;
             void getPrimesSequential1(const unsigned int maxNumber);
             void fillNSizeList(const unsigned int maxNumber);
@@ -25,11 +26,13 @@ namespace primos{
             void getPrimesSequential2(const unsigned int maxNumber);
             bool isPrimeGivenList(const unsigned int number);
 
+            std::vector<unsigned int> numerosPrimosVector;
             void getPrimesSequential2Vector(const unsigned int maxNumber);
-            bool isPrimeGivenVector(const unsigned int number);
+            bool isPrimeGivenVectorSequential(const unsigned int number);
+            bool isPrimeGivenVectorParallel(const unsigned int number);
 
             void getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs);
-            
+
             void dizOi();
     };
 }

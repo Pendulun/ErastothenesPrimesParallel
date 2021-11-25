@@ -26,5 +26,8 @@ int main(int argc, const char **argv)
     if(argumentsChecker.isToPrintTime() || argumentsChecker.isToPrintAllInfo()){
         erasSieve.printLastExecTime();
     }
+
+    erasSieve.clearPrimes();
+    
     return 0;
 }
