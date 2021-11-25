@@ -15,7 +15,7 @@ int main(int argc, const char **argv)
         usage();
     }
 
-    primos::ErastothenesSieve erasSieve;
+    primos::ErastothenesSieve erasSieve(argumentsChecker.getMaxNumber());
 
     erasSieve.getPrimesTill(argumentsChecker.getMaxNumber(), argumentsChecker.getNumProcessors());
 
@@ -26,6 +26,5 @@ int main(int argc, const char **argv)
     if(argumentsChecker.isToPrintTime() || argumentsChecker.isToPrintAllInfo()){
         erasSieve.printLastExecTime();
     }
-    //Tratar caso maxNumber for <= 2
     return 0;
 }
