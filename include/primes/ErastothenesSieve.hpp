@@ -16,9 +16,14 @@ namespace primos{
         private:
             std::list<unsigned int> numerosPrimos;
             std::chrono::duration<double, std::milli> timeExec;
-            void getPrimesSequential(const unsigned int maxNumber);
-            void getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs);
+            void getPrimesSequential1(const unsigned int maxNumber);
             void fillNSizeList(const unsigned int maxNumber);
+            
+            void getPrimesSequential2(const unsigned int maxNumber);
+            bool isPrimeGivenList(const unsigned int number);
+
+            void getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs);
+            
             void dizOi();
     };
 }

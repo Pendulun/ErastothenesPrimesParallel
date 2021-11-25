@@ -3,10 +3,9 @@
 namespace primos{
     void ErastothenesSieve::getPrimesTill(const unsigned int maxNumber, const unsigned int numProcs){
 
-        this->fillNSizeList(maxNumber);
         auto initTime = std::chrono::high_resolution_clock::now();
         if(numProcs == 1){
-            this->getPrimesSequential(maxNumber);
+            this->getPrimesSequential2(maxNumber);
         }else{
             this->getPrimesParallel(maxNumber, numProcs);
         }
@@ -15,7 +14,10 @@ namespace primos{
         this->timeExec = std::chrono::duration_cast<std::chrono::milliseconds>(fp_ms);
     }
 
-    void ErastothenesSieve::getPrimesSequential(const unsigned int maxNumber){
+    void ErastothenesSieve::getPrimesSequential1(const unsigned int maxNumber){
+        
+        this->fillNSizeList(maxNumber);
+
         unsigned int primeAtual = 0;
         unsigned int primeCount = 0;
 
@@ -44,6 +46,42 @@ namespace primos{
 
             primeCount += 1;
         }
+    }
+
+    void ErastothenesSieve::getPrimesSequential2(const unsigned int maxNumber){
+        this->numerosPrimos.clear();
+        if(maxNumber<2){
+            return;
+        }
+
+        this->numerosPrimos.push_back(2);
+        if(maxNumber == 2){
+            return;
+        }
+
+        unsigned int maxLimitForLoop = 0;
+        if(maxNumber%2 == 0){
+            maxLimitForLoop = (maxNumber/2) - 1;
+        }else{
+            maxLimitForLoop = floor(maxNumber/2);
+        }
+        unsigned int numAtual = 0;
+        for(unsigned int num = 1; num<=maxLimitForLoop; num++){
+            numAtual = (2*num)+1;
+            if(this->isPrimeGivenList(numAtual)){
+                this->numerosPrimos.push_back(numAtual);
+            }
+        }
+    }
+
+    bool ErastothenesSieve::isPrimeGivenList(const unsigned int number){
+        for(auto prime : this->numerosPrimos){
+            if(number%prime == 0){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     void ErastothenesSieve::getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs){
@@ -101,6 +139,7 @@ namespace primos{
 
     void ErastothenesSieve::printLastExecTime(){
         std::cout<<this->timeExec.count()<<std::endl;
+        std::cout<<"QTD PRIMES GENERATED: "<<this->numerosPrimos.size()<<std::endl;
     }
 
     void ErastothenesSieve::dizOi(){
