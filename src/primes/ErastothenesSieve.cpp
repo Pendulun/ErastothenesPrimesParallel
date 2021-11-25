@@ -75,9 +75,9 @@ namespace primos{
     }
 
     bool ErastothenesSieve::isPrimeGivenList(const unsigned int number){
-
+        long double squared_number = sqrt(number);
         for(auto prime : this->numerosPrimos){
-            if(prime > sqrt(number)){
+            if(prime > squared_number){
                 return true;
             }
 
