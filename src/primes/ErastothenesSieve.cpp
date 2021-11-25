@@ -4,7 +4,6 @@ namespace primos{
     void ErastothenesSieve::getPrimesTill(const unsigned int maxNumber, const unsigned int numProcs){
 
         this->fillNSizeList(maxNumber);
-
         auto initTime = std::chrono::high_resolution_clock::now();
         if(numProcs == 1){
             this->getPrimesSequential(maxNumber);
@@ -12,8 +11,8 @@ namespace primos{
             this->getPrimesParallel(maxNumber, numProcs);
         }
         auto endTime = std::chrono::high_resolution_clock::now();
-        this->timeExec = std::chrono::duration_cast<std::chrono::seconds>(endTime - initTime);
-
+        std::chrono::duration<double, std::milli> fp_ms = endTime - initTime;
+        this->timeExec = std::chrono::duration_cast<std::chrono::milliseconds>(fp_ms);
     }
 
     void ErastothenesSieve::getPrimesSequential(const unsigned int maxNumber){
@@ -21,7 +20,6 @@ namespace primos{
         unsigned int primeCount = 0;
 
         std::list<unsigned int>::iterator iterador;
-
         while(true){
             //Get the next prime
             if(primeCount == this->numerosPrimos.size()){
@@ -36,9 +34,10 @@ namespace primos{
             iterador = this->numerosPrimos.begin();
             std::advance(iterador, primeCount+1);
 
+
             for(iterador; iterador!=numerosPrimos.end();iterador++){
                 //Remove number if it's not a prime
-                if(*iterador%primeAtual == 0){
+                if(*iterador != primeAtual && *iterador%primeAtual == 0){
                     iterador = this->numerosPrimos.erase(iterador);
                 }
             }
@@ -63,8 +62,24 @@ namespace primos{
 
     void ErastothenesSieve::fillNSizeList(const unsigned int maxNumber){
         this->numerosPrimos.clear();
-        for(unsigned int num = 2; num<=maxNumber; num++){
-            this->numerosPrimos.push_back(num);
+        if(maxNumber<2){
+            return;
+        }
+
+        this->numerosPrimos.push_back(2);
+        if(maxNumber == 2){
+            return;
+        }
+
+        unsigned int maxLimitForLoop = 0;
+        if(maxNumber%2 == 0){
+            maxLimitForLoop = (maxNumber/2) - 1;
+        }else{
+            maxLimitForLoop = floor(maxNumber/2);
+        }
+
+        for(unsigned int num = 1; num<=maxLimitForLoop; num++){
+            this->numerosPrimos.push_back((2*num)+1);
         }
     }
 
