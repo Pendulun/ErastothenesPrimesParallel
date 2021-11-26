@@ -186,9 +186,9 @@ namespace primos{
         unsigned int numAtual = 0;
         for(unsigned int num = 1; num<=maxLimitForLoop; num++){
             numAtual = (2*num)+1;
-            bool isPrime = this->isPrimeGivenVectorParallel(numAtual, numProcs);
+            bool isPrime = this->isPrimeGivenVectorParallel4(numAtual, numProcs);
 
-            //std::cout<<num<<" ISPRIME: "<<isPrime<<std::endl;
+            //std::cout<<numAtual<<" ISPRIME: "<<isPrime<<std::endl;
             if(isPrime){
                 this->numerosPrimosVector.push_back(numAtual);
             }
@@ -218,6 +218,142 @@ namespace primos{
         
         return !globalNotPrime;
 
+    }
+
+    bool ErastothenesSieve::isPrimeGivenVectorParallel2(const unsigned int number, const unsigned int numProcs){
+        long double squared_number = sqrt(number);
+        unsigned int divisor;
+        unsigned int logBase = 2;
+        //log_{b}^{a} = log(a)/log(b)
+        if(this->numerosPrimosVector.size() > logBase){
+            long double resultBase = log(this->numerosPrimosVector.size())/log(logBase);
+            //std::cout<<"resultBase: "<<resultBase<<std::endl;
+            divisor = floor(resultBase*2);
+        }else{
+            divisor = 1;
+        }
+        
+
+        bool globalNotPrime = false;
+        bool foundIsMultiple = false;
+        bool primeBiggerThanSqrt = false;
+        bool checkedAllPrimes = false;
+        unsigned int blockCount = 0;
+        unsigned int blockSize = 1;
+        if(this->numerosPrimosVector.size() > divisor){
+            blockSize = ceil(this->numerosPrimosVector.size()/divisor);
+        }
+        
+        //std::cout<<"BLock SIze: "<<blockSize<<std::endl;
+         
+        while(!globalNotPrime && !primeBiggerThanSqrt && !checkedAllPrimes){
+            bool localNotPrime = false;
+            unsigned int blockStartIndex = blockSize*blockCount;
+            //std::cout<<"Block start: "<<blockStartIndex;
+            unsigned int blockEndIndex = blockStartIndex+blockSize;
+            //std::cout<<" Block end: "<<blockEndIndex;
+            if(blockEndIndex >= this->numerosPrimosVector.size()-1){
+                blockEndIndex = this->numerosPrimosVector.size();
+                checkedAllPrimes = true;
+            }
+            //std::cout<<" Checking all primes: "<<checkedAllPrimes<<std::endl;
+            #pragma omp parallel num_threads(numProcs) \
+                default(none) \ 
+                shared(squared_number, globalNotPrime, primeBiggerThanSqrt, blockStartIndex, blockEndIndex, logBase) \
+                firstprivate(localNotPrime)
+            {
+            #pragma omp for nowait schedule(static, 2*logBase)
+            for(std::size_t idxPrime = blockStartIndex; idxPrime < blockEndIndex; idxPrime++){
+                unsigned int elemento = this->numerosPrimosVector[idxPrime];
+                if(elemento <= squared_number){
+                    localNotPrime = this->isMultipleOf(number, elemento) || localNotPrime;
+                }else{
+                    #pragma omp critical(endPrimeSearchSqrt) 
+                    primeBiggerThanSqrt = true;
+                }
+                
+            }
+
+            #pragma omp critical(verifyNotPrime)
+                globalNotPrime = globalNotPrime || localNotPrime;
+            }
+
+            blockCount++;
+
+        }
+        
+        return !globalNotPrime;
+
+    }
+
+    bool ErastothenesSieve::isPrimeGivenVectorParallel3(const unsigned int number, const unsigned int numProcs){
+        long double squared_number = sqrt(number);
+        bool globalNotPrime = false;
+        unsigned int maxNumChecked = squared_number;
+        #pragma omp parallel num_threads(numProcs) 
+        {
+            bool localNotPrime = false;
+            #pragma omp for nowait schedule(static, 2)
+            for(unsigned int divisor = 2; divisor <= maxNumChecked; divisor++){
+                    localNotPrime = this->isMultipleOf(number, divisor) || localNotPrime;
+            }
+
+            #pragma omp critical
+            {
+                globalNotPrime = globalNotPrime || localNotPrime;  
+            }   
+        }
+        return !globalNotPrime;
+    }
+
+    bool ErastothenesSieve::isPrimeGivenVectorParallel4(const unsigned int number, const unsigned int numProcs){
+        unsigned int root_number = floor(sqrt(number));
+        unsigned int numBlocks = ceil(log(root_number));
+        unsigned int blockSize = 1;
+
+        if(root_number < 40){
+            numBlocks = 1;
+        }
+
+        bool globalIsPrime = true;
+        bool checkedAllPrimes = false;
+
+        
+        if(root_number > numBlocks){
+            blockSize = ceil(root_number/numBlocks);
+        }
+        
+        unsigned int blockCount = 0;
+        while(globalIsPrime  && !checkedAllPrimes){
+            unsigned int blockStartNum = blockSize*blockCount;
+            if(blockStartNum == 0){
+                blockStartNum = 2;
+            }
+            unsigned int blockEndNum = blockStartNum+blockSize;
+
+            if(blockEndNum > root_number){
+                blockEndNum = root_number;
+            }
+
+            #pragma omp parallel num_threads(numProcs) \
+                default(none) \ 
+                shared(root_number, globalIsPrime, blockStartNum, blockEndNum)
+                {
+                #pragma omp for schedule(static, 1) reduction(&&: globalIsPrime)
+                    for(unsigned int numDivisor = blockStartNum; numDivisor <= blockEndNum; numDivisor++){
+                        globalIsPrime = !this->isMultipleOf(number, numDivisor) && globalIsPrime;
+                    }
+                }
+            
+            blockCount++;
+
+            if(blockCount == numBlocks){
+                checkedAllPrimes = true;
+            }
+
+        }
+        
+        return globalIsPrime;
     }
 
     bool ErastothenesSieve::isMultipleOf(const unsigned int num, const unsigned int prime){
