@@ -8,15 +8,7 @@ void usage(){
     exit(1);
 }
 
-int main(int argc, const char **argv)
-{
-    dataEntry::ArgumentsChecker argumentsChecker;
-    if(!argumentsChecker.setAllArguments(argc, argv)){
-        usage();
-    }
-
-    primos::ErastothenesSieve erasSieve(argumentsChecker.getMaxNumber());
-
+void calculaTempoMedio(primos::ErastothenesSieve &erasSieve, dataEntry::ArgumentsChecker &argumentsChecker){
     unsigned int numMaxIteracoes = 10;
     double somaTempos = 0;
     for(int i = 0; i<numMaxIteracoes; i++){
@@ -35,7 +27,30 @@ int main(int argc, const char **argv)
     double tempoMedio = somaTempos/numMaxIteracoes;
 
     std::cout<<"Tempo médio de execucao de "<<numMaxIteracoes<<" iteracoes foi de "<<tempoMedio<<std::endl;
+}
+
+int main(int argc, const char **argv)
+{
+    dataEntry::ArgumentsChecker argumentsChecker;
+    if(!argumentsChecker.setAllArguments(argc, argv)){
+        usage();
+    }
+
+    primos::ErastothenesSieve erasSieve(argumentsChecker.getMaxNumber());
+
+    // calculaTempoMedio(erasSieve, argumentsChecker);
     
+    erasSieve.alocaEspacoVectorPrimos(argumentsChecker.getMaxNumber());
+    erasSieve.getPrimesTill(argumentsChecker.getMaxNumber(), argumentsChecker.getNumProcessors());
+    if(argumentsChecker.isToPrintPrimes() || argumentsChecker.isToPrintAllInfo()){
+        erasSieve.printAllPrimes();
+    }
+
+    if(argumentsChecker.isToPrintTime() || argumentsChecker.isToPrintAllInfo()){
+        erasSieve.printLastExecTime();
+    }
+
+    erasSieve.clearPrimes();
 
     return 0;
 }

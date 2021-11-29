@@ -116,7 +116,7 @@ namespace primos{
         #pragma omp parallel num_threads(numProcs) 
         {
             bool localNotPrime = false;
-            #pragma omp for nowait schedule(static, 2)
+            #pragma omp for nowait schedule(auto)
             for(unsigned int divisor = 2; divisor <= squared_number; divisor++){
                     localNotPrime = this->isMultipleOf(number, divisor) || localNotPrime;
             }
