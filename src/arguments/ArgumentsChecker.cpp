@@ -25,15 +25,11 @@ namespace dataEntry{
         }
 
         try{
-            
-            std::cout<<"Max number lido: "<<argv[1]<<"\n";
             if(!this->checkIfNumber(argv[1])){
                 return false;
             }
             this->maxNumber = std::strtol(argv[1], NULL, 10);
             
-
-            std::cout<<"Type lido: "<<argv[2]<<"\n";
             std::string type = (std::string) argv[2];
             if( type.compare("a") == 0 || 
                 type.compare("l") == 0 || 
@@ -43,7 +39,6 @@ namespace dataEntry{
                     return false;
                 } 
             
-            std::cout<<"NumProcessors lido: "<<argv[3]<<"\n";
             if(!this->checkIfNumber(argv[3])){
                 return false;
             }

@@ -25,10 +25,8 @@ namespace primos{
             void getPrimesSequential(const unsigned int maxNumber);
             bool isPrimeGivenVectorSequential(const unsigned int number);
 
-            void getPrimesParallel(const unsigned int maxNumber, const unsigned int numProcs);
             void getPrimesParallelVector(const unsigned int maxNumber, const unsigned int numProcs);
-            bool isPrimeGivenVectorParallel3(const unsigned int number, const unsigned int numProcs);
-            bool isPrimeGivenVectorParallel4(const unsigned int number, const unsigned int numProcs);
+            bool isPrimeGivenVectorParallel(const unsigned int number, const unsigned int numProcs);
             bool isMultipleOf(const unsigned int num, const unsigned int prime);
     };
 }
