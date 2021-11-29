@@ -17,17 +17,25 @@ int main(int argc, const char **argv)
 
     primos::ErastothenesSieve erasSieve(argumentsChecker.getMaxNumber());
 
-    erasSieve.getPrimesTill(argumentsChecker.getMaxNumber(), argumentsChecker.getNumProcessors());
+    unsigned int numMaxIteracoes = 10;
+    double somaTempos = 0;
+    for(int i = 0; i<numMaxIteracoes; i++){
+        erasSieve.alocaEspacoVectorPrimos(argumentsChecker.getMaxNumber());
+        erasSieve.getPrimesTill(argumentsChecker.getMaxNumber(), argumentsChecker.getNumProcessors());
+        somaTempos += erasSieve.getExecTime();
+        if(argumentsChecker.isToPrintPrimes() || argumentsChecker.isToPrintAllInfo()){
+            erasSieve.printAllPrimes();
+        }
 
-    if(argumentsChecker.isToPrintPrimes() || argumentsChecker.isToPrintAllInfo()){
-        erasSieve.printAllPrimes();
+        if(argumentsChecker.isToPrintTime() || argumentsChecker.isToPrintAllInfo()){
+            erasSieve.printLastExecTime();
+        }
     }
 
-    if(argumentsChecker.isToPrintTime() || argumentsChecker.isToPrintAllInfo()){
-        erasSieve.printLastExecTime();
-    }
+    double tempoMedio = somaTempos/numMaxIteracoes;
 
-    erasSieve.clearPrimes();
+    std::cout<<"Tempo médio de execucao de "<<numMaxIteracoes<<" iteracoes foi de "<<tempoMedio<<std::endl;
     
+
     return 0;
 }
